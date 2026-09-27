@@ -41,6 +41,12 @@ Later settings override earlier ones, so put your own overrides after this inclu
 
 Press **Ctrl+Shift+F5** to reload, or open a new Kitty window. Tabs appear when two or more tabs are open; **Ctrl+Shift+T** opens another tab with Kitty's default shortcuts.
 
+### Light variant
+
+`kitty/tennoworth-light.conf` is a light paper-and-ink variant. Install it the same way, copying it to `"$kitty_dir/tennoworth-light.conf"` and using `include tennoworth-light.conf` instead of `include nier.conf`. Include only one of the two themes.
+
+In the light variant, ANSI black is a paper tone so black-on-color badges (for example `ls` on `/tmp`) stay readable; plain black text is therefore very faint.
+
 ## Match the font
 
 The original setup uses the system monospace selection, which resolves to **Noto Sans Mono** on the author's machine. Install that font separately to match it; no font files are bundled. Add after the theme include:
@@ -96,7 +102,22 @@ map ctrl+shift+enter launch --location=vsplit --cwd=current
 
 These optional lines select the splits layout and override that shortcut. See the [layouts guide](https://sw.kovidgoyal.net/kitty/layouts/) for other arrangements. The preview uses two panes, two tabs, and `window_padding_width 12`.
 
-The theme sets terminal colors, numbered tab titles, tab visibility, and border width. It does not change your shell, keyboard shortcuts, layouts, or workspace commands. Apps that draw their own RGB colors may need separate application themes. Desktop decorations are controlled by your window manager.
+The theme sets terminal colors, faint-text opacity, the extended 256-color palette, numbered tab titles, tab visibility, and border width. It does not change your shell, keyboard shortcuts, layouts, or workspace commands. Desktop decorations are controlled by your window manager.
+
+### Apps with their own colors
+
+Some tools send exact RGB colors and ignore the terminal palette; bat's default theme is one. To make them follow the theme, add to your shell startup file:
+
+```sh
+# bat, and delta, which uses bat's themes
+export BAT_THEME=ansi
+# fzf: use the 16 theme colors
+export FZF_DEFAULT_OPTS="--color=16"
+```
+
+Editors such as Neovim with `termguicolors` also use their own colorscheme.
+
+`assets/theme-improvements.html` compares real tool output (git, gcc, rustc, ls, Python) under the previous and current palettes.
 
 ## Update or remove
 
@@ -108,7 +129,7 @@ To remove the optional prompt, remove its source line from `.zshrc`, restore you
 
 ## Compatibility and credits
 
-Verified on Linux with Kitty 0.48.2 and Zsh / Powerlevel10k. macOS is untested. Refer to [Kitty's configuration reference](https://sw.kovidgoyal.net/kitty/conf/) for configuration paths and platform-specific reload shortcuts.
+Verified on Linux with Kitty 0.49.1 and Zsh / Powerlevel10k. `palette_generate` requires Kitty 0.47 or newer; older versions warn about the unknown option and keep the default 256-color palette. macOS is untested. Refer to [Kitty's configuration reference](https://sw.kovidgoyal.net/kitty/conf/) for configuration paths and platform-specific reload shortcuts.
 
 The palette was adapted from the author's local NieR-inspired Konsole and KDE color schemes, with a brighter ANSI bright-black for readable comments. This is an unofficial fan-made terminal theme; no game artwork or fonts are included.
 
