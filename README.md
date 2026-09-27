@@ -1,20 +1,32 @@
 # NieR Kitty
 
-A dark brown, parchment, and amber look for [Kitty](https://sw.kovidgoyal.net/kitty/), inspired by NieR:Automata. Muted ANSI colors keep errors, diffs, and syntax distinct; flat amber tabs and borders mark keyboard focus.
+Two [Kitty](https://sw.kovidgoyal.net/kitty/) themes inspired by NieR:Automata: a dark brown, parchment, and amber theme, and a light paper-and-ink variant. Both are tuned for the output you read every day: Git hashes and diffs, compiler warnings and errors, tracebacks, and dim hint text each stay distinct from normal text. Flat tabs and pane borders mark keyboard focus.
 
-![NieR Kitty with the optional Pure-style prompt, ANSI palette, and split panes](assets/preview.png)
+![NieR Kitty dark theme: git log, git diff, a rustc warning, and a Python traceback beside the ANSI palette, with the optional Pure-style prompt](assets/preview.png)
 
-The theme works with any shell. The optional Zsh / Powerlevel10k preset adds a two-line Pure-style prompt, Git status, a 24-hour clock, and transient prompts.
+![Tennoworth light variant showing the same output and palette on khaki paper](assets/preview-light.png)
 
-## Install the Kitty theme
+The themes work with any shell. The optional Zsh / Powerlevel10k preset adds the two-line Pure-style prompt shown above, with Git status, a 24-hour clock, and transient prompts.
 
-Install Kitty using your distribution's package manager, then clone this repository:
+## What the themes set
+
+- **Distinct semantic colors.** Yellow output (Git hashes, warnings, quoted strings) no longer blends into body text, and errors and warnings meet 4.5:1 contrast. The light variant's six colors are chosen together so each pair stays easy to tell apart.
+- **Readable faint text.** `dim_opacity` keeps hints, timings, and secondary output legible.
+- **Themed 256-color palette.** `palette_generate semantic` derives colors 16–255 from the theme, so tools that use the extended palette (prompt grays, editor cursor lines) match it.
+- **Terminal chrome.** Selection, cursor, Kitty marks, numbered tabs, and pane borders.
+
+`assets/theme-improvements.html` compares real tool output (git, gcc, rustc, ls, Python) under the previous and current palettes, with measured contrast for each change.
+
+## Install a Kitty theme
+
+Install Kitty using your distribution's package manager, then clone this repository and choose a theme:
 
 ```sh
 git clone https://github.com/PedroAmorimP/nier-kitty.git
 cd nier-kitty
 kitty_dir="${XDG_CONFIG_HOME:-$HOME/.config}/kitty"
 mkdir -p "$kitty_dir"
+theme=nier.conf  # or tennoworth-light.conf for the light variant
 ```
 
 If you use `KITTY_CONFIG_DIRECTORY` or `kitty --config`, set `kitty_dir` to your actual configuration directory instead. Downloading and extracting the GitHub ZIP also works; run the remaining commands from the extracted directory.
@@ -23,43 +35,39 @@ Back up any existing files before copying:
 
 ```sh
 backup_stamp="$(date +%Y%m%d-%H%M%S)"
-for file in kitty.conf nier.conf; do
+for file in kitty.conf "$theme"; do
   if [ -e "$kitty_dir/$file" ]; then
     cp -p "$kitty_dir/$file" "$kitty_dir/$file.backup-$backup_stamp"
   fi
 done
-cp kitty/nier.conf "$kitty_dir/nier.conf"
+cp "kitty/$theme" "$kitty_dir/$theme"
 ```
 
-Add this line **once**, at the end of your existing `kitty.conf` (create that file if needed):
+Add **one** include line at the end of your existing `kitty.conf` (create that file if needed):
 
 ```conf
 include nier.conf
 ```
 
-Later settings override earlier ones, so put your own overrides after this include. If you use Kitty's theme picker afterward, check the ordering of its `current-theme.conf` include.
+For the light variant, use `include tennoworth-light.conf` instead. Include only one theme. Later settings override earlier ones, so put your own overrides after the include. If you use Kitty's theme picker afterward, check the ordering of its `current-theme.conf` include.
 
 Press **Ctrl+Shift+F5** to reload, or open a new Kitty window. Tabs appear when two or more tabs are open; **Ctrl+Shift+T** opens another tab with Kitty's default shortcuts.
 
-### Light variant
-
-`kitty/tennoworth-light.conf` is a light paper-and-ink variant. Install it the same way, copying it to `"$kitty_dir/tennoworth-light.conf"` and using `include tennoworth-light.conf` instead of `include nier.conf`. Include only one of the two themes.
-
-In the light variant, ANSI black is a paper tone so black-on-color badges (for example `ls` on `/tmp`) stay readable; plain black text is therefore very faint.
+In the light variant, ANSI black is a paper tone so black-on-color badges (for example `ls` on `/tmp`) stay readable; plain black text is therefore very faint. White stays a readable ink, so white-on-red badges (for example `ls` on setuid files) are hard to read.
 
 ## Match the font
 
-The original setup uses the system monospace selection, which resolves to **Noto Sans Mono** on the author's machine. Install that font separately to match it; no font files are bundled. Add after the theme include:
+The screenshots use **Noto Sans Mono** at `font_size 11.0`. Install that font separately to match them; no font files are bundled. Add after the theme include:
 
 ```conf
 font_family Noto Sans Mono
 ```
 
-The preview uses `font_size 11.0`. Font size is your choice; the theme does not set it. You can also use Kitty's [font chooser](https://sw.kovidgoyal.net/kitty/kittens/choose-fonts/). The supplied prompt hides segment icons, so it does not require a Nerd Font specifically; your font or fallback must cover its arrows and prompt symbols.
+Font size is your choice; the theme does not set it. You can also use Kitty's [font chooser](https://sw.kovidgoyal.net/kitty/kittens/choose-fonts/). The supplied prompt hides segment icons, so it does not require a Nerd Font specifically; your font or fallback must cover its arrows and prompt symbols.
 
 ## Optional: the matching shell prompt
 
-Requires Zsh and [Powerlevel10k](https://github.com/romkatv/powerlevel10k#installation). Install and load Powerlevel10k using its upstream instructions for your shell setup. Oh My Zsh and CachyOS are not required.
+Requires Zsh and [Powerlevel10k](https://github.com/romkatv/powerlevel10k#installation). Install and load Powerlevel10k using its upstream instructions for your shell setup. Oh My Zsh and CachyOS are not required. The prompt uses ANSI colors, so it follows whichever theme you include.
 
 From this repository's directory:
 
@@ -84,7 +92,7 @@ This only supplies the prompt. Autosuggestions, syntax highlighting, aliases, an
 
 ## Customize
 
-Put overrides after `include nier.conf`, for example:
+Put overrides after the theme include, for example:
 
 ```conf
 # Show the tab bar even with a single tab.
@@ -100,9 +108,9 @@ enabled_layouts splits
 map ctrl+shift+enter launch --location=vsplit --cwd=current
 ```
 
-These optional lines select the splits layout and override that shortcut. See the [layouts guide](https://sw.kovidgoyal.net/kitty/layouts/) for other arrangements. The preview uses two panes, two tabs, and `window_padding_width 12`.
+These optional lines select the splits layout and override that shortcut. See the [layouts guide](https://sw.kovidgoyal.net/kitty/layouts/) for other arrangements. The screenshots use two panes, two tabs, and `window_padding_width 12`.
 
-The theme sets terminal colors, faint-text opacity, the extended 256-color palette, numbered tab titles, tab visibility, and border width. It does not change your shell, keyboard shortcuts, layouts, or workspace commands. Desktop decorations are controlled by your window manager.
+The themes do not change your shell, keyboard shortcuts, layouts, or workspace commands. Desktop decorations are controlled by your window manager.
 
 ### Apps with their own colors
 
@@ -117,13 +125,11 @@ export FZF_DEFAULT_OPTS="--color=16"
 
 Editors such as Neovim with `termguicolors` also use their own colorscheme.
 
-`assets/theme-improvements.html` compares real tool output (git, gcc, rustc, ls, Python) under the previous and current palettes.
-
 ## Update or remove
 
 To update, run `git pull --ff-only` in your clone, back up the installed files as above, and copy the theme and optional prompt again. Do not add duplicate include/source lines. Local edits to installed copies will be replaced, so keep Kitty overrides in `kitty.conf` after the include.
 
-To remove the theme, remove `include nier.conf` from `kitty.conf`, remove any font or appearance overrides you added, then reload Kitty. Delete the installed `nier.conf` only after removing its include. If it replaced a pre-existing file, restore that file from your backup instead.
+To remove a theme, remove its include line from `kitty.conf`, remove any font or appearance overrides you added, then reload Kitty. Delete the installed theme file only after removing its include. If it replaced a pre-existing file, restore that file from your backup instead.
 
 To remove the optional prompt, remove its source line from `.zshrc`, restore your previous prompt source line, and open a new shell. You can then delete the installed `nier-kitty/p10k.zsh` or restore its previous version from backup. Keep backups until you are satisfied with the result.
 
@@ -131,6 +137,6 @@ To remove the optional prompt, remove its source line from `.zshrc`, restore you
 
 Verified on Linux with Kitty 0.49.1 and Zsh / Powerlevel10k. `palette_generate` requires Kitty 0.47 or newer; older versions warn about the unknown option and keep the default 256-color palette. macOS is untested. Refer to [Kitty's configuration reference](https://sw.kovidgoyal.net/kitty/conf/) for configuration paths and platform-specific reload shortcuts.
 
-The palette was adapted from the author's local NieR-inspired Konsole and KDE color schemes, with a brighter ANSI bright-black for readable comments. This is an unofficial fan-made terminal theme; no game artwork or fonts are included.
+The dark palette was adapted from the author's local NieR-inspired Konsole and KDE color schemes. The light variant uses the paper and ink tones of the author's Tennoworth YoRHa light theme. This is an unofficial fan-made terminal theme; no game artwork or fonts are included.
 
 Original work is [MIT licensed](LICENSE). The optional prompt derives from Powerlevel10k's `p10k-pure.zsh` preset, inspired by [Pure](https://github.com/sindresorhus/pure); its upstream MIT notice is retained in [licenses/powerlevel10k.txt](licenses/powerlevel10k.txt).
