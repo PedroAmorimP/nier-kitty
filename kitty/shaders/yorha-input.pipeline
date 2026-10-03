@@ -1,0 +1,18 @@
+# Keep the ambient treatment visible, including when focus changes.
+textures a
+
+# A small scratch column stores one panel mask value per screen row.
+startgroup
+    viewport_size 0.01 1
+    animation_stop never
+    animation_step 50
+    shaders yorha-panel-mask
+    output_texture a
+endgroup
+
+startgroup
+    attach
+    animation_stop never
+    animation_step 50
+    shaders yorha-input
+endgroup

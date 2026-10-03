@@ -2,6 +2,16 @@
 
 Two [Kitty](https://sw.kovidgoyal.net/kitty/) themes inspired by NieR:Automata: a dark brown, parchment, and amber theme, and a light paper-and-ink variant. Both are tuned for the output you read every day: Git hashes and diffs, compiler warnings and errors, tracebacks, and dim hint text each stay distinct from normal text. Flat tabs and pane borders mark keyboard focus.
 
+Choose the **clean theme** for the original appearance, or add the **optional YoRHa shader** to the dark theme for flowing amber light and sparkles in supported terminal input panels.
+
+| Version | Configuration | Requirements |
+| --- | --- | --- |
+| Clean dark | `include nier.conf` | Kitty; 0.47+ for the generated palette |
+| Clean light | `include tennoworth-light.conf` | Kitty; 0.47+ for the generated palette |
+| Dark with YoRHa shimmer | `include nier.conf`, then `include yorha-input.conf` | Kitty 0.49+, shader-slang, and the supplied shader files |
+
+The standard installation below installs a clean theme. Follow [the shader installation](#optional-animated-yorha-input-shimmer) to add the animated version.
+
 ![NieR Kitty dark theme: git log, git diff, a rustc warning, and a Python traceback beside the ANSI palette, with the optional Pure-style prompt](assets/preview.png)
 
 ![Tennoworth light variant showing the same output and palette on khaki paper](assets/preview-light.png)
@@ -125,9 +135,57 @@ export FZF_DEFAULT_OPTS="--color=16"
 
 Editors such as Neovim with `termguicolors` also use their own colorscheme.
 
+### Optional: animated YoRHa input shimmer
+
+The dark theme has an optional bronze input treatment with flowing amber light, sparse parchment particles, faint scanlines, and a fine gold edge. Open `assets/yorha-input-mockup.html` in a browser to explore the design.
+
+![YoRHa input shader in Kitty, with preserved ANSI colors and selected text](assets/yorha-input-preview.png)
+
+This uses [Kitty custom shaders](https://sw.kovidgoyal.net/kitty/custom-shaders/) and requires Kitty **0.49 or newer** plus the **shader-slang** compiler (`slangc`). On Arch/CachyOS, install the compiler with `sudo pacman -S shader-slang`.
+
+From the repository directory, using the same `kitty_dir` as above:
+
+```sh
+mkdir -p "$kitty_dir/shaders"
+backup_stamp="$(date +%Y%m%d-%H%M%S)"
+for file in yorha-input.conf shaders/yorha-input.pipeline shaders/yorha-input.slang shaders/yorha-panel-mask.slang; do
+  if [ -e "$kitty_dir/$file" ]; then
+    cp -p "$kitty_dir/$file" "$kitty_dir/$file.backup-$backup_stamp"
+  fi
+done
+cp kitty/yorha-input.conf "$kitty_dir/"
+cp kitty/shaders/yorha-input.pipeline kitty/shaders/yorha-input.slang kitty/shaders/yorha-panel-mask.slang "$kitty_dir/shaders/"
+```
+
+After copying the shader files, the animated version uses these two includes in `kitty.conf`, in this order:
+
+```conf
+include nier.conf
+include yorha-input.conf
+```
+
+Reload with **Ctrl+Shift+F5**. The pipeline requests a frame every 50 ms (20 fps) and keeps the treatment visible across focus changes. Remove the include and reload to disable it. If you already use `custom_shaders`, combine shader names in one setting; later settings replace earlier ones.
+
+The shared shader recognizes two input styles inside the active pane:
+
+- **Colored panels**, such as the Codex reference's **`#302d2a`** background.
+- **Ruled panels**, such as the supplied Claude reference: the terminal background between two long neutral gray horizontal lines near the bottom of the pane. A narrow scratch pass detects the panel once per screen row. Text and the horizontal rules retain their colors; matching background pixels between the rules receive the effect.
+
+![Shared shader preview showing colored and Claude-style ruled input panels](assets/yorha-claude-preview.png)
+
+These are visual heuristics, not application-aware input detection. Other regions with the same color or pair of rules can match. Ruled panels must be within the bottom 320 physical pixels, with borders 12–192 physical pixels apart; large multiline inputs or different UI styles may not match. Codex and Claude were previewed in Kitty and confirmed by the author in their terminal apps; Gemini has not been validated. Transparent windows and the light theme are not supported. The shader does not move or resize the application's input field.
+
+Adjust `INTENSITY` (default `0.6`), `SPEED` (default `1.0`), `PARTICLE_DENSITY` (default `0.28`), `SPARKLE_BRIGHTNESS` (default `0.12`), or `INPUT_RGB` in `shaders/yorha-input.slang`, then reload. Set `DETECT_RULED_PANELS` to `false` in `shaders/yorha-panel-mask.slang` to disable ruled-panel detection. For a static effect, set `SPEED` to `0.0` and set both `animation_step` entries to `0` in the pipeline.
+
+For a sparklier look, try `INTENSITY = 1.0`, `PARTICLE_DENSITY = 0.55`, and `SPARKLE_BRIGHTNESS = 0.25`. The density and brightness settings affect particles; intensity also brightens the flowing light. Edit the installed shader, then reload Kitty.
+
 ## Update or remove
 
 To update, run `git pull --ff-only` in your clone, back up the installed files as above, and copy the theme and optional prompt again. Do not add duplicate include/source lines. Local edits to installed copies will be replaced, so keep Kitty overrides in `kitty.conf` after the include.
+
+If you use the shader version, also repeat the shader backup and copy commands. Preserve any custom shader constants before updating: copying the supplied shaders restores their defaults.
+
+To return to the clean dark theme, remove only `include yorha-input.conf` and reload Kitty. Keep `include nier.conf`. Once the effect is disabled, you may delete `yorha-input.conf`, `shaders/yorha-input.pipeline`, `shaders/yorha-input.slang`, and `shaders/yorha-panel-mask.slang` from the Kitty configuration directory.
 
 To remove a theme, remove its include line from `kitty.conf`, remove any font or appearance overrides you added, then reload Kitty. Delete the installed theme file only after removing its include. If it replaced a pre-existing file, restore that file from your backup instead.
 

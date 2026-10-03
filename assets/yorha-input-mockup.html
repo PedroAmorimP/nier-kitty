@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NieR Kitty · YoRHa input shimmer</title>
+  <style>
+    :root { color-scheme: dark; --paper: #d6c6a2; --amber: #e8b968; --intensity: .6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #14110d; color: var(--paper); font-family: ui-monospace, "Noto Sans Mono", monospace; }
+    main { max-width: 1440px; margin: auto; padding: 64px 40px; }
+    .eyebrow { color: #948061; font-size: 11px; letter-spacing: .22em; }
+    h1 { font: 400 clamp(24px, 4vw, 40px)/1.25 ui-monospace, monospace; margin: 18px 0 12px; color: #f2e4bc; }
+    .intro { max-width: 680px; color: #948061; font-size: 13px; line-height: 1.8; }
+    .terminal { margin-top: 44px; border: 1px solid #3a3226; box-shadow: 0 24px 80px #0005; background: #14110d; }
+    .titlebar { padding: 13px 20px; border-bottom: 1px solid #30281c; display: flex; justify-content: space-between; gap: 20px; color: #948061; font-size: 11px; }
+    .titlebar strong { color: #d4b576; font-weight: 400; }
+    .output { padding: 28px 24px 16px; min-height: 230px; font-size: 13px; line-height: 1.9; }
+    .prompt { color: #8a9c4a; }
+    .quiet { color: #948061; }
+    .answer { margin-top: 20px; max-width: 860px; }
+    .answer::before { content: '◆'; color: #d4a558; margin-right: 12px; }
+    .usage { padding: 8px 24px 12px; text-align: right; font-size: 11px; color: #a58a50; }
+    .input-panel { position: relative; isolation: isolate; overflow: hidden; background: #292218; border-top: 1px solid #715833; border-bottom: 1px solid #59452a; }
+    .effects { position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: var(--intensity); }
+    .flow { position: absolute; inset: -100% -60%; background: radial-gradient(ellipse at 38% 60%, #e8b96824 0%, #c08e3a0d 22%, transparent 48%), linear-gradient(108deg, transparent 35%, #e8b9680a 46%, #f2e4bc16 50%, #e8b9680a 54%, transparent 64%); animation: drift 14s ease-in-out infinite alternate; }
+    .scanlines { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 3px, #f2e4bc06 3px 4px); opacity: .55; }
+    .edge { position: absolute; top: 0; left: -30%; width: 30%; height: 1px; background: linear-gradient(90deg, transparent, #f2e4bcaa, transparent); animation: edge 16s linear infinite; }
+    .particle { position: absolute; width: 2px; height: 2px; background: #f2e4bc; box-shadow: 0 0 5px #e8b96866; animation: dust var(--duration) ease-in-out infinite; animation-delay: var(--delay); opacity: 0; }
+    .particle.diamond { width: 3px; height: 3px; rotate: 45deg; }
+    .input-row { display: flex; gap: 14px; padding: 20px 24px; align-items: flex-start; }
+    .input-symbol { color: var(--amber); font-size: 16px; line-height: 24px; }
+    textarea { display: block; width: 100%; min-height: 48px; resize: vertical; border: 0; padding: 0; outline: none; background: transparent; color: #f2e4bc; font: 13px/24px ui-monospace, "Noto Sans Mono", monospace; caret-color: var(--amber); }
+    textarea::selection { background: #c08e3a; color: #14110d; }
+    .input-panel:focus-within { border-top-color: #d4a558; }
+    .status { padding: 12px 24px; font-size: 11px; line-height: 1.8; color: #948061; }
+    .status .model { color: #d6c6a2; } .status .path { color: #a4b85a; } .status .mode { color: #be86a8; } .status .limit { color: #ce5d44; }
+    .controls { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding: 24px 0; font-size: 12px; color: #948061; }
+    .controls label { display: flex; align-items: center; gap: 12px; }
+    input[type="range"] { width: 140px; accent-color: #d4a558; }
+    button { border: 1px solid #59452a; background: #252017; color: #d6c6a2; padding: 9px 14px; font: inherit; cursor: pointer; }
+    button:hover { border-color: #d4a558; }
+    button:focus-visible, input:focus-visible { outline: 2px solid #e8b968; outline-offset: 4px; }
+    .notes { font-size: 11px; line-height: 1.8; color: #948061; max-width: 760px; }
+    .paused .effects * { animation-play-state: paused; }
+    .flat .effects { visibility: hidden; }
+    .flat .input-panel { background: #302e2a; border-color: transparent; }
+    @keyframes drift { from { transform: translateX(-12%) translateY(5%); } to { transform: translateX(12%) translateY(-5%); } }
+    @keyframes edge { to { left: 110%; } }
+    @keyframes dust { 0%, 100% { opacity: 0; transform: translate(-10px, 6px); } 30% { opacity: .45; } 60% { opacity: .7; } 90% { opacity: 0; transform: translate(28px, -9px); } }
+    @media (prefers-reduced-motion: reduce) { .effects * { animation-play-state: paused; } }
+    @media (max-width: 600px) { main { padding: 32px 16px; } .titlebar, .output, .input-row, .status { padding-left: 16px; padding-right: 16px; } .titlebar span { display: none; } .usage { font-size: 10px; } .controls { gap: 16px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">NIER KITTY / INTERFACE STUDY 01</div>
+    <h1>A little light in the machinery.</h1>
+    <p class="intro">A bronze input panel with a slow amber current, drifting parchment particles, and a fine illuminated edge. Try typing below.</p>
+    <section class="terminal" aria-label="Terminal appearance mockup">
+      <div class="titlebar"><strong>01: nier-kitty</strong><span>YoRHa · terminal interface</span></div>
+      <div class="output">
+        <div><span class="prompt">~/dev/nier-kitty</span> <span class="quiet">main</span></div>
+        <div><span class="prompt">❯</span> codex</div>
+        <div class="answer">The input is ready. Warm amber light moves softly across the panel.</div>
+        <div class="quiet">&nbsp; Text stays sharp while the background catches the light.</div>
+      </div>
+      <div class="usage">△ 5h limit: 36% left · resets at 3:24 PM · /status</div>
+      <div class="input-panel">
+        <div class="effects" aria-hidden="true"><div class="flow"></div><div class="scanlines"></div><div class="edge"></div></div>
+        <div class="input-row"><span class="input-symbol" aria-hidden="true">›</span><textarea aria-label="Message input" spellcheck="false">I want the nier-kitty input to feel like a softly glowing YoRHa interface.</textarea></div>
+      </div>
+      <div class="status"><span class="model">GPT-6.1-Sol medium</span> · <span class="path">~/dev/nier-kitty</span> · <span class="mode">Approve for me</span> · <span class="limit">5h 36% left · weekly 74% left</span></div>
+    </section>
+    <div class="controls" role="group" aria-label="Appearance controls">
+      <label for="intensity">Shimmer <input id="intensity" type="range" min="0" max="100" value="60"><output id="amount" for="intensity">60%</output></label>
+      <button id="motion" type="button" aria-pressed="false">Pause motion</button>
+      <button id="compare" type="button" aria-pressed="false">Show original</button>
+    </div>
+    <p class="notes">HTML appearance concept. The input is editable; it does not send messages. “Show original” approximates the flat input background in your screenshot. Motion starts paused when your system requests reduced motion.</p>
+  </main>
+  <script>
+    const effects = document.querySelector('.effects');
+    for (let i = 0; i < 22; i++) {
+      const particle = document.createElement('span');
+      particle.className = 'particle' + (i % 6 === 0 ? ' diamond' : '');
+      particle.style.left = `${(i * 43.7 + 7) % 100}%`;
+      particle.style.top = `${i % 2 ? 78 + i % 13 : 10 + i % 11}%`;
+      particle.style.setProperty('--duration', `${7 + i % 7}s`);
+      particle.style.setProperty('--delay', `${-i * 1.3}s`);
+      effects.appendChild(particle);
+    }
+    const intensity = document.querySelector('#intensity');
+    intensity.addEventListener('input', () => {
+      document.documentElement.style.setProperty('--intensity', intensity.value / 100);
+      document.querySelector('#amount').value = `${intensity.value}%`;
+    });
+    const motion = document.querySelector('#motion');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    // Inline play state permits an explicit user choice to override the system default.
+    let paused = reducedMotion.matches;
+    function updateMotion() {
+      effects.querySelectorAll('*').forEach(el => el.style.animationPlayState = paused ? 'paused' : 'running');
+      motion.textContent = paused ? 'Resume motion' : 'Pause motion';
+      motion.setAttribute('aria-pressed', String(paused));
+    }
+    updateMotion();
+    motion.addEventListener('click', () => { paused = !paused; updateMotion(); });
+    const compare = document.querySelector('#compare');
+    compare.addEventListener('click', () => {
+      const original = document.body.classList.toggle('flat');
+      compare.textContent = original ? 'Show YoRHa shimmer' : 'Show original';
+      compare.setAttribute('aria-pressed', String(original));
+    });
+  </script>
+</body>
+</html>
