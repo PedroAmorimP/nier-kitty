@@ -16,7 +16,7 @@ The standard installation below installs a clean theme. Follow [the shader insta
 
 ![Tennoworth light variant showing the same output and palette on khaki paper](assets/preview-light.png)
 
-The themes work with any shell. The optional Zsh / Powerlevel10k preset adds the two-line Pure-style prompt shown above, with Git status, a 24-hour clock, and transient prompts.
+The themes work with any shell. The optional Zsh / Powerlevel10k preset adds the two-line Pure-style prompt shown above, with Git status, a 24-hour clock, and transient prompts. An optional [pi](https://pi.dev) harness theme keeps that agent on the dark theme's amber accents instead of its own violet ones.
 
 ## What the themes set
 
@@ -99,6 +99,20 @@ source "${XDG_CONFIG_HOME:-$HOME/.config}/nier-kitty/p10k.zsh"
 If you already source another Powerlevel10k preset, comment out that source line and use this one instead. Keep the old preset file for rollback. Open a new shell to see the result. Existing instant-prompt initialization can stay in place; see the [upstream instant-prompt guide](https://github.com/romkatv/powerlevel10k#instant-prompt) if enabling it for the first time.
 
 This only supplies the prompt. Autosuggestions, syntax highlighting, aliases, and other shell plugins are independent and are not installed here.
+
+## Optional: the matching pi harness theme
+
+[pi](https://pi.dev) builds its default `system` theme from the terminal palette, so NieR's muted ANSI magenta becomes pi's violet accents: the footer's model label, inline code, syntax types, and the input-box border that tracks the thinking level. `pi/nier.json` keeps the palette pi generates for this theme and moves only those tokens to the dark theme's amber accents. The `system` theme is untouched if you skip it.
+
+From this repository's directory:
+
+```sh
+pi_dir="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/themes"
+mkdir -p "$pi_dir"
+cp pi/nier.json "$pi_dir/"
+```
+
+Run `/reload` in pi, then choose **nier** under `/settings` → **Theme**. Choose **system** again to go back. The file is a snapshot of the colors pi generates for this palette, so edit its `vars` to retune the accents. Its input-box border is the same rule pair the [YoRHa shimmer](#optional-animated-yorha-input-shimmer) detects. The light variant is not covered.
 
 ## Customize
 
@@ -184,7 +198,7 @@ For a sparklier look, try `INTENSITY = 1.0`, `PARTICLE_DENSITY = 0.55`, and `SPA
 
 ## Update or remove
 
-To update, run `git pull --ff-only` in your clone, back up the installed files as above, and copy the theme and optional prompt again. Do not add duplicate include/source lines. Local edits to installed copies will be replaced, so keep Kitty overrides in `kitty.conf` after the include.
+To update, run `git pull --ff-only` in your clone, back up the installed files as above, and copy the theme, the optional prompt, and the pi theme again. Do not add duplicate include/source lines. Local edits to installed copies will be replaced, so keep Kitty overrides in `kitty.conf` after the include.
 
 If you use the shader version, also repeat the shader backup and copy commands. Preserve any custom shader constants before updating: copying the supplied shaders restores their defaults.
 
@@ -194,10 +208,12 @@ To remove a theme, remove its include line from `kitty.conf`, remove any font or
 
 To remove the optional prompt, remove its source line from `.zshrc`, restore your previous prompt source line, and open a new shell. You can then delete the installed `nier-kitty/p10k.zsh` or restore its previous version from backup. Keep backups until you are satisfied with the result.
 
+To remove the pi theme, choose **system** in pi's `/settings` and delete the copied `themes/nier.json`.
+
 ## Compatibility and credits
 
-Verified on Linux with Kitty 0.49.1 and Zsh / Powerlevel10k. `palette_generate` requires Kitty 0.47 or newer; older versions warn about the unknown option and keep the default 256-color palette. macOS is untested. Refer to [Kitty's configuration reference](https://sw.kovidgoyal.net/kitty/conf/) for configuration paths and platform-specific reload shortcuts.
+Verified on Linux with Kitty 0.49.1 and Zsh / Powerlevel10k; the pi theme matches pi 1.0.4's theme schema. `palette_generate` requires Kitty 0.47 or newer; older versions warn about the unknown option and keep the default 256-color palette. macOS is untested. Refer to [Kitty's configuration reference](https://sw.kovidgoyal.net/kitty/conf/) for configuration paths and platform-specific reload shortcuts.
 
 The dark palette was adapted from the author's local NieR-inspired Konsole and KDE color schemes. The light variant uses the paper and ink tones of the author's Tennoworth YoRHa light theme. This is an unofficial fan-made terminal theme; no game artwork or fonts are included.
 
-Original work is [MIT licensed](LICENSE). The optional prompt derives from Powerlevel10k's `p10k-pure.zsh` preset, inspired by [Pure](https://github.com/sindresorhus/pure); its upstream MIT notice is retained in [licenses/powerlevel10k.txt](licenses/powerlevel10k.txt).
+Original work is [MIT licensed](LICENSE). The optional prompt derives from Powerlevel10k's `p10k-pure.zsh` preset, inspired by [Pure](https://github.com/sindresorhus/pure); its upstream MIT notice is retained in [licenses/powerlevel10k.txt](licenses/powerlevel10k.txt). The pi theme holds color values from pi's own `system` theme generator for this palette; pi is MIT licensed.
