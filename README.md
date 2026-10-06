@@ -166,16 +166,19 @@ include yorha-input.conf
 
 Reload with **Ctrl+Shift+F5**. The pipeline requests a frame every 50 ms (20 fps) and keeps the treatment visible across focus changes. Remove the include and reload to disable it. If you already use `custom_shaders`, combine shader names in one setting; later settings replace earlier ones.
 
-The shared shader recognizes two input styles inside the active pane:
+The shared shader recognizes three input styles inside the active pane:
 
 - **Colored panels**, such as the Codex reference's **`#302d2a`** background.
-- **Ruled panels**, such as the supplied Claude reference: the terminal background between two long neutral gray horizontal lines near the bottom of the pane. A narrow scratch pass detects the panel once per screen row. Text and the horizontal rules retain their colors; matching background pixels between the rules receive the effect.
+- **Neutral ruled panels**, such as the supplied Claude reference: the terminal background between two long neutral gray horizontal lines near the bottom of the pane.
+- **Tinted ruled panels**, as the pi TUI draws them: the same rule pair in the application's own border color, which here shifts with its mode (violet at higher thinking levels, green in bash mode). Both rules must share one color.
+
+A narrow scratch pass detects either kind of ruled panel once per screen row. Text and the horizontal rules retain their colors; matching background pixels between the rules receive the effect.
 
 ![Shared shader preview showing colored and Claude-style ruled input panels](assets/yorha-claude-preview.png)
 
-These are visual heuristics, not application-aware input detection. Other regions with the same color or pair of rules can match. Ruled panels must be within the bottom 320 physical pixels, with borders 12–192 physical pixels apart; large multiline inputs or different UI styles may not match. Codex and Claude were previewed in Kitty and confirmed by the author in their terminal apps; Gemini has not been validated. Transparent windows and the light theme are not supported. The shader does not move or resize the application's input field.
+These are visual heuristics, not application-aware input detection. Other regions with the same color or pair of rules can match. Ruled panels must be within the bottom 320 physical pixels, with borders 12–192 physical pixels apart; large multiline inputs or different UI styles may not match. Codex and Claude were previewed in Kitty and confirmed by the author in their terminal apps; the pi TUI input panel was verified with pi 1.0.4 on Kitty 0.49.2; Gemini has not been validated. Transparent windows and the light theme are not supported. The shader does not move or resize the application's input field.
 
-Adjust `INTENSITY` (default `0.6`), `SPEED` (default `1.0`), `PARTICLE_DENSITY` (default `0.28`), `SPARKLE_BRIGHTNESS` (default `0.12`), or `INPUT_RGB` in `shaders/yorha-input.slang`, then reload. Set `DETECT_RULED_PANELS` to `false` in `shaders/yorha-panel-mask.slang` to disable ruled-panel detection. For a static effect, set `SPEED` to `0.0` and set both `animation_step` entries to `0` in the pipeline.
+Adjust `INTENSITY` (default `0.6`), `SPEED` (default `1.0`), `PARTICLE_DENSITY` (default `0.28`), `SPARKLE_BRIGHTNESS` (default `0.12`), or `INPUT_RGB` in `shaders/yorha-input.slang`, then reload. Set `DETECT_RULED_PANELS` to `false` in `shaders/yorha-panel-mask.slang` to disable ruled-panel detection, or `DETECT_TINTED_RULES` to `false` to keep only neutral gray rules. For a static effect, set `SPEED` to `0.0` and set both `animation_step` entries to `0` in the pipeline.
 
 For a sparklier look, try `INTENSITY = 1.0`, `PARTICLE_DENSITY = 0.55`, and `SPARKLE_BRIGHTNESS = 0.25`. The density and brightness settings affect particles; intensity also brightens the flowing light. Edit the installed shader, then reload Kitty.
 
