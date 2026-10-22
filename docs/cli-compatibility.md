@@ -1,0 +1,15 @@
+# CLI compatibility review
+
+Reviewed on 2026-10-22. This is an upstream documentation and configuration review; it does not extend the visual verification claims in the README. Local versions were Kitty 0.49.2, Codex CLI 0.163.0, Claude Code 2.1.304, and pi 1.0.4. No installed applications were updated.
+
+| Tool | Upstream reviewed | Effect on this repository |
+| --- | --- | --- |
+| Codex CLI | [0.163.0 and recent releases](https://learn.chatgpt.com/docs/changelog), [CLI customization](https://learn.chatgpt.com/docs/cli-customization) | `/theme` and custom `.tmTheme` files control highlighting. Treat the shader's `#302d2a` match as a reference appearance; different themes need a visual check. Recent config, steering, and scrolling changes do not establish a need to change the shader API. |
+| Claude Code | [Changelog through 2.1.308](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md) | Custom prompt borders and `/color` mean neutral gray is only one possible appearance. The existing tinted-rule detector already handles matching colored rules. Recent fixes do not establish a new panel geometry; latest-version visual verification remains pending. |
+| pi | [1.4.0](https://github.com/earendil-works/pi/releases/tag/v1.4.0), [theme documentation](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/docs/themes.md), [changelog](https://github.com/earendil-works/pi/blob/v1.4.0/packages/coding-agent/CHANGELOG.md) | Version 1.2.0 moved the published theme schema. Updated `pi/nier.json` to its new URL. Existing tokens and amber variables remain valid against the published schema's field requirements. The palette is still a 1.0.4 snapshot, not a regenerated 1.4.0 system theme. |
+| Gemini CLI | [Release notes, including 0.65.0](https://github.com/google-gemini/gemini-cli/blob/main/docs/changelogs/index.md), [themes](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/themes.md) | ANSI and ANSI Light are available for terminal palette integration. No bundled Gemini theme or verified input shader support; keep the unvalidated status. |
+| Kitty | [0.49.2 changelog](https://sw.kovidgoyal.net/kitty/changelog/#detailed-list-of-changes) | Custom shaders remain supported from 0.49. Version 0.49.1 fixed missing pipeline files in some packages; prefer a current patch release when troubleshooting. No shader-interface migration identified. |
+
+The pi schema is now published at [pi.dev/schemas/theme.schema.json](https://pi.dev/schemas/theme.schema.json); the old raw GitHub JSON path returns 404. The schema reference helps editors and does not change the theme's colors.
+
+Before claiming visual compatibility with another release, inspect a short and multiline prompt, selections, ANSI output, focus changes, and split panes in Kitty. For pi, also check thinking-level and bash-mode borders. For Codex and Claude, record the selected application theme and any prompt-border override. The ruled-panel detector still requires borders 12–192 physical pixels apart within the bottom 320 physical pixels, and can match unrelated rule pairs.
