@@ -1,6 +1,8 @@
 # CLI compatibility review
 
-Reviewed on 2026-10-22. This is an upstream documentation and configuration review; it does not extend the visual verification claims in the README. Local versions were Kitty 0.49.2, Codex CLI 0.163.0, Claude Code 2.1.304, and pi 1.0.4. No installed applications were updated.
+Reviewed on 2026-10-22. This is an upstream documentation and configuration review; it does not extend the visual verification claims in the README. Initial local versions were Kitty 0.49.2, Codex CLI 0.163.0, Claude Code 2.1.304, and pi 1.0.4.
+
+After the review, native updaters upgraded Claude Code to 2.1.308 and pi to 1.4.0; Codex's updater confirmed 0.163.0 as current. Version commands passed afterward, and the installed pi theme received the schema-link fix with a backup. Gemini CLI was not installed. These installation checks do not constitute visual shader verification.
 
 | Tool | Upstream reviewed | Effect on this repository |
 | --- | --- | --- |
