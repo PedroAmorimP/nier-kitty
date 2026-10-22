@@ -144,10 +144,12 @@ Some tools send exact RGB colors and ignore the terminal palette; bat's default 
 # bat, and delta, which uses bat's themes
 export BAT_THEME=ansi
 # fzf: use the 16 theme colors
-export FZF_DEFAULT_OPTS="--color=16"
+export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:+$FZF_DEFAULT_OPTS }--color=16"
 ```
 
 Editors such as Neovim with `termguicolors` also use their own colorscheme.
+
+Codex CLI has its own `/theme` picker for code and diffs, including custom `.tmTheme` files; Kitty's palette does not control all of those colors. Gemini CLI offers **ANSI** and **ANSI Light** through `/theme` to follow the terminal palette. This does not establish Gemini input-shader compatibility. See the [CLI compatibility review](docs/cli-compatibility.md) for upstream sources and the latest review scope.
 
 ### Optional: animated YoRHa input shimmer
 
@@ -185,6 +187,8 @@ The shared shader recognizes three input styles inside the active pane:
 - **Colored panels**, such as the Codex reference's **`#302d2a`** background.
 - **Neutral ruled panels**, such as the supplied Claude reference: the terminal background between two long neutral gray horizontal lines near the bottom of the pane.
 - **Tinted ruled panels**, as the pi TUI draws them: the same rule pair in the application's own border color, which here shifts with its mode (violet at higher thinking levels, green in bash mode). Both rules must share one color.
+
+With the supplied pi theme, higher thinking levels use amber instead of violet. Claude Code can also use colored prompt borders, which are handled by the tinted-rule path when the panel otherwise matches. Codex themes can change its input background: `#302d2a` is the reference color, not a guarantee for every theme. If the effect disappears after changing a CLI theme, recheck its background or rule pair before adjusting the shader constants.
 
 A narrow scratch pass detects either kind of ruled panel once per screen row. Text and the horizontal rules retain their colors; matching background pixels between the rules receive the effect.
 
