@@ -114,6 +114,38 @@ cp pi/nier.json "$pi_dir/"
 
 Run `/reload` in pi, then choose **nier** under `/settings` → **Theme**. Choose **system** again to go back. The file is a snapshot of the colors pi generates for this palette, so edit its `vars` to retune the accents. Its input-box border is the same rule pair the [YoRHa shimmer](#optional-animated-yorha-input-shimmer) detects. The light variant is not covered.
 
+## Optional: Kwi, KDE's new terminal (experimental)
+
+[Kwi](https://invent.kde.org/utilities/kwi) is KDE's new GPU-accelerated terminal, built on libghostty-vt. It takes its colors from two files, and the `kwi/` directory supplies both for each theme:
+
+| File | Kwi setting | Sets |
+| --- | --- | --- |
+| `nier.colorscheme`, `tennoworth-light.colorscheme` | **Colors → Terminal** | Background, foreground, and the 16 ANSI colors |
+| `nier.colors`, `tennoworth-light.colors` | **Colors → Window** | Tabs, menus, the search highlight, and the **selection color** |
+
+The `.colorscheme` files use Konsole's format, so Konsole can use them as well.
+
+For the Flathub or nightly Flatpak build, from this repository's directory:
+
+```sh
+kwi_data="$HOME/.var/app/org.kde.kwi/data"   # native install: "${XDG_DATA_HOME:-$HOME/.local/share}"
+mkdir -p "$kwi_data/kwi/color-schemes" "$kwi_data/color-schemes"
+cp kwi/nier.colorscheme kwi/tennoworth-light.colorscheme "$kwi_data/kwi/color-schemes/"
+cp kwi/nier.colors kwi/tennoworth-light.colors "$kwi_data/color-schemes/"
+```
+
+Kwi notices new terminal color schemes while it runs; restart it if the window scheme doesn't appear in the list. Open **Settings → Appearance** and choose **NieR** (or **Tennoworth Light**) under both **Terminal** and **Window**. A native (non-Flatpak) Kwi also lists Konsole schemes in `~/.local/share/konsole/`.
+
+Kwi has no setting yet for several things the Kitty themes set:
+
+- **Cursor color.** The cursor takes the color of the text under it; Kitty's amber cursor is not available.
+- **Faint text.** Kwi ignores Konsole's `Faint` colors (Konsole still uses them) and applies its own dimming.
+- **Colors 16–255.** Kwi keeps the standard xterm values; nothing like Kitty's `palette_generate` exists.
+- **Marks and split-pane borders.** Kwi has no marks, and split panes are only planned.
+- **The YoRHa input shimmer.** Kwi cannot load custom shaders, so the effect stays Kitty-only.
+
+See the [Kwi review](docs/kwi.md) for how Kwi reads these files and options for future work.
+
 ## Customize
 
 Put overrides after the theme include, for example:
